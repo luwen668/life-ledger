@@ -1,2 +1,7 @@
-node_modules/
-.DS_Store
+# 本仓库只收录「人生账单」项目文件，目录内其他项目与文档不上传
+/*
+!.gitignore
+!.nojekyll
+!index.html
+!design-doc.md
+!README.md
