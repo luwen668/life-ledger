@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>人生账单 — 三笔账，三分钟</title>
+<meta name="description" content="输入几个真实数字，生成一张值得截图分享的人生账单：时间余额、工资人生、房贷真相。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ========== 设计系统 · 暖沙账簿 ========== */
+:root {
+  --paper:  #FAF7F2;
+  --ink:    #1A1A18;
+  --red:    #C0392B;
+  --gray:   #8A8577;
+  --green:  #2D5A3D;
+  --line:   #E5E0D5;
+  --serif:  'Fraunces', 'Songti SC', 'Noto Serif SC', serif;
+  --sans:   'Inter', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.8;
+  overflow-x: hidden;
+}
+::selection { background: var(--red); color: var(--paper); }
+
+/* ---- 字阶 ---- */
+.giant {
+  font-family: var(--serif);
+  font-size: clamp(64px, 12vw, 160px);
+  line-height: .95;
+  font-variation-settings: "SOFT" 100, "WONK" 1;
+  font-weight: 560;
+  letter-spacing: -0.01em;
+}
+.giant .unit { font-size: .22em; font-weight: 400; margin-left: .08em; color: var(--gray); }
+.act-title {
+  font-family: var(--serif);
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.25;
+  font-weight: 520;
+  font-variation-settings: "SOFT" 60, "WONK" 1;
+}
+.label {
+  font-size: 12px; font-weight: 500; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--gray);
+}
+.body-text { font-size: 15px; color: var(--gray); max-width: 34em; }
+.accent { color: var(--red); }
+.positive { color: var(--green); }
+
+/* ---- 布局 ---- */
+.screen {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 12vh 16vw;
+  text-align: center;
+  gap: 28px;
+  position: relative;
+}
+@media (max-width: 720px) { .screen { padding: 12vh 16px; } }
+.screen > * { max-width: 100%; }
+
+/* ---- 幕分隔细线 ---- */
+.act-divider {
+  width: 100%; height: 1px; background: var(--line);
+  transform: scaleX(0); transform-origin: left;
+}
+.act-head { display: flex; align-items: baseline; gap: 16px; }
+.act-no { font-family: var(--serif); font-size: 15px; color: var(--red); }
+.divider-caption { font-size: 14px; color: var(--gray); padding: 20px 16vw 60px; text-align: center; }
+
+/* ---- Hero ---- */
+#hero { gap: 20px; }
+#hero .title-line { overflow: hidden; }
+#hero .title-line span {
+  display: block; transform: translateY(110%);
+  font-family: var(--serif);
+  font-size: clamp(40px, 7.5vw, 104px);
+  line-height: 1.15; font-weight: 480;
+  font-variation-settings: "SOFT" 100, "WONK" 1;
+}
+#hero .sub { color: var(--gray); font-size: 15px; opacity: 0; }
+#heartbeat {
+  margin-top: 6vh; opacity: 0;
+  font-family: var(--serif); font-size: clamp(18px, 2.2vw, 26px);
+}
+#heartbeat .hb-num { color: var(--red); }
+#scroll-hint {
+  position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+  font-size: 12px; letter-spacing: .2em; color: var(--gray);
+  animation: breathe 1.8s ease-in-out infinite;
+}
+@keyframes breathe { 0%,100% { opacity: .3; } 50% { opacity: 1; } }
+
+/* ---- 输入组件 ---- */
+.input-row { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.input-field { position: relative; }
+.input-field input {
+  border: none; border-bottom: 1px solid var(--ink);
+  background: transparent; font-family: var(--serif);
+  font-size: 28px; padding: 8px 4px; text-align: center;
+  color: var(--ink); width: 260px; outline: none;
+  transition: border-color .3s;
+}
+.input-field input:focus { border-bottom-color: var(--red); }
+.input-field::after {
+  content: ''; position: absolute; left: 0; bottom: 0; height: 1px; width: 100%;
+  background: var(--red); transform: scaleX(0); transform-origin: left;
+  transition: transform .5s cubic-bezier(.22,1,.36,1);
+}
+.input-field:focus-within::after { transform: scaleX(1); }
+.input-error { color: var(--red); font-size: 13px; min-height: 20px; }
+
+.btn {
+  font-family: var(--sans); font-size: 14px; font-weight: 500;
+  color: var(--ink); background: none; border: none; cursor: pointer;
+  border-bottom: 1px solid var(--ink); padding: 6px 2px;
+  transition: color .25s, border-color .25s;
+}
+.btn:hover { color: var(--red); border-bottom-color: var(--red); }
+.btn-primary {
+  border: 1px solid var(--ink); border-radius: 999px;
+  padding: 12px 36px; font-size: 15px;
+  transition: all .25s;
+}
+.btn-primary:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+/* ---- 格子画布 ---- */
+#gridCanvas { width: min(560px, 82vw); height: auto; display: block; }
+#gridPct { font-family: var(--serif); font-size: clamp(28px, 4vw, 44px); color: var(--red); }
+
+/* ---- 类比条目 ---- */
+.analogy-list { display: flex; flex-direction: column; gap: 14px; text-align: left; }
+.analogy-item {
+  font-size: clamp(15px, 2vw, 18px); color: var(--ink);
+  display: flex; align-items: baseline; gap: 10px;
+  opacity: 0; transform: translateY(20px);
+}
+.analogy-item .arrow { color: var(--red); font-family: var(--serif); }
+.analogy-item .num {
+  font-family: var(--serif); font-weight: 560; color: var(--red);
+  font-size: 1.25em;
+}
+
+/* ---- 卡片 ---- */
+.card-stage { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+#cardPreview {
+  width: min(360px, 78vw); height: auto;
+  box-shadow: 0 24px 60px -20px rgba(26,26,24,.28);
+  border: 1px solid var(--line);
+}
+.card-actions { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
+
+/* ---- 占位幕 ---- */
+.locked { color: var(--gray); }
+.locked .act-title { color: var(--gray); }
+.lock-tag {
+  font-size: 12px; letter-spacing: .12em; border: 1px solid var(--line);
+  border-radius: 999px; padding: 6px 18px; color: var(--gray);
+}
+
+/* ---- 房贷图表 ---- */
+.seg-control { display: flex; gap: 0; border: 1px solid var(--ink); border-radius: 999px; overflow: hidden; }
+.seg-control button {
+  border: none; background: transparent; padding: 10px 26px;
+  font-family: var(--sans); font-size: 14px; cursor: pointer; color: var(--gray);
+  transition: all .25s;
+}
+.seg-control button.on { background: var(--ink); color: var(--paper); }
+
+.stacked-bar {
+  width: min(560px, 82vw); height: 64px; display: flex;
+  border: 1px solid var(--line);
+}
+.stacked-bar .seg { display: flex; align-items: center; font-size: 13px; color: var(--paper); white-space: nowrap; overflow: hidden; }
+.stacked-bar .seg-p { background: var(--ink); justify-content: flex-end; padding-right: 10px; }
+.stacked-bar .seg-i { background: var(--red); padding-left: 10px; }
+.bar-legend { display: flex; gap: 32px; font-size: 13px; color: var(--gray); }
+.bar-legend .dot { display: inline-block; width: 10px; height: 10px; margin-right: 7px; }
+
+.vbars { display: flex; align-items: flex-end; gap: clamp(40px, 10vw, 96px); height: 340px; }
+.vbar { width: 110px; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; gap: 12px; }
+.vbar .col { width: 100%; height: 0; }
+.vbar .base { background: var(--red); }
+.vbar .alt  { background: var(--green); }
+.vbar .cap { font-size: 13px; color: var(--gray); line-height: 1.5; }
+
+/* ---- 结尾 ---- */
+#act4 .giant { font-size: clamp(36px, 6vw, 80px); font-weight: 480; }
+.ending-lines p { opacity: 0; transform: translateY(16px); margin: 8px 0; }
+.ending-lines .final { color: var(--red); font-size: 15px; margin-top: 32px; }
+
+/* ---- 幕导航 ---- */
+#nav {
+  position: fixed; top: 24px; right: 24px; z-index: 50;
+  display: flex; flex-direction: column; gap: 12px; align-items: flex-end;
+}
+#nav a {
+  display: flex; align-items: center; gap: 8px; text-decoration: none;
+  font-size: 11px; letter-spacing: .1em; color: var(--gray);
+  transition: color .3s;
+}
+#nav a::after {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--line); transition: all .3s;
+}
+#nav a.active { color: var(--ink); }
+#nav a.active::after { background: var(--red); transform: scale(1.5); }
+#nav a .nav-label { opacity: 0; transform: translateX(6px); transition: all .3s; }
+#nav a.active .nav-label, #nav:hover a .nav-label { opacity: 1; transform: none; }
+@media (max-width: 720px) { #nav { top: 16px; right: 16px; } #nav a .nav-label { display: none; } }
+
+/* ---- 页脚 ---- */
+footer { padding: 40px 16px 60px; text-align: center; font-size: 12px; color: var(--gray); }
+
+/* ---- 动效入场基态 ---- */
+.reveal { opacity: 0; transform: translateY(24px); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .reveal, .analogy-item, .ending-lines p, #hero .sub, #heartbeat { opacity: 1 !important; transform: none !important; }
+  #hero .title-line span { transform: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- 幕导航 -->
+<nav id="nav">
+  <a href="#hero"  data-spy="hero"><span class="nav-label">开场</span></a>
+  <a href="#act1"  data-spy="act1"><span class="nav-label">01 时间</span></a>
+  <a href="#act2"  data-spy="act2"><span class="nav-label">02 工资</span></a>
+  <a href="#act3"  data-spy="act3"><span class="nav-label">03 房贷</span></a>
+  <a href="#act4"  data-spy="act4"><span class="nav-label">结尾</span></a>
+</nav>
+
+<!-- 第 0 幕 · Hero -->
+<section class="screen" id="hero">
+  <p class="label reveal">人生账单 · LIFE LEDGER</p>
+  <h1>
+    <div class="title-line"><span>你的人生，</span></div>
+    <div class="title-line"><span>值多少钱？</span></div>
+  </h1>
+  <p class="sub" id="heroSub">不算账的人，正在被账算。</p>
+  <p id="heartbeat">现在，你的 1 小时 ≈ <span class="hb-num" id="hbNum">¥ —</span></p>
+  <p id="scroll-hint">↓ 向下滚动 · 三笔账，三分钟</p>
+</section>
+
+<!-- 第 1 幕 · 时间余额 -->
+<section id="act1">
+  <div class="act-head screen" style="min-height:40vh; padding-bottom:4vh;">
+    <span class="act-no">01</span>
+    <h2 class="act-title">先算时间。</h2>
+  </div>
+
+  <!-- 输入屏 -->
+  <div class="screen" id="inputScreen">
+    <div class="input-row">
+      <label class="label" for="birthInput">你的出生年月</label>
+      <div class="input-field">
+        <input type="month" id="birthInput" min="1920-01" max="2026-09" aria-label="出生年月">
+      </div>
+      <p class="input-error" id="birthError"></p>
+      <button class="btn btn-primary" id="birthSubmit">开始算账</button>
+    </div>
+  </div>
+
+  <!-- 屏1 · 已活天数 -->
+  <div class="screen" id="daysScreen">
+    <p class="body-text reveal">你已经活了</p>
+    <p class="giant" aria-live="polite"><span id="daysAlive">—</span><span class="unit">天</span></p>
+    <p class="body-text reveal" style="color:var(--ink)">没有感觉？往下看。</p>
+  </div>
+
+  <!-- 屏2 · 人生格子图 -->
+  <div class="screen" id="gridScreen" style="min-height:160vh;">
+    <div style="position:sticky; top:12vh; display:flex; flex-direction:column; align-items:center; gap:24px;">
+      <p class="body-text">一格，是一个星期。亮着的，是已经花掉的。</p>
+      <canvas id="gridCanvas" width="1092" height="1700" aria-label="人生格子图"></canvas>
+      <p id="gridPct" aria-live="polite">0%</p>
+    </div>
+  </div>
+
+  <!-- 屏3 · 剩余 -->
+  <div class="screen" id="remainScreen">
+    <p class="body-text reveal">假设活到 80 岁，你还剩</p>
+    <p class="giant" aria-live="polite"><span id="daysLeft">—</span><span class="unit">天</span></p>
+  </div>
+
+  <!-- 屏4 · 具象化类比 -->
+  <div class="screen" id="analogyScreen">
+    <p class="body-text reveal">换种说法——</p>
+    <div class="analogy-list" id="analogyList"></div>
+    <p class="body-text reveal" style="color:var(--ink); margin-top:12px;">
+      格子已经点亮了 <span class="accent" id="pctEcho">—</span>。<br>剩下的，打算怎么花？
+    </p>
+  </div>
+
+  <!-- 屏5 · 卡片 -->
+  <div class="screen" id="cardScreen">
+    <p class="label reveal">你的卡片 · CARD №.01</p>
+    <div class="card-stage">
+      <canvas id="cardPreview" width="1080" height="1350" aria-label="时间余额卡片预览"></canvas>
+      <div class="card-actions">
+        <button class="btn btn-primary" id="downloadCard">保存卡片</button>
+        <button class="btn" id="reshuffle">换一组类比</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider-caption">钱会再赚，时间不会。但钱，也值得算一笔。</div>
+
+<!-- 第 2 幕 · 工资人生 -->
+<section id="act2">
+  <div class="act-divider"></div>
+  <div class="act-head screen" style="min-height:40vh; padding-bottom:4vh;">
+    <span class="act-no">02</span>
+    <h2 class="act-title">再算钱。</h2>
+  </div>
+
+  <!-- 输入屏 -->
+  <div class="screen" id="salaryInputScreen">
+    <div class="input-row" style="gap:28px;">
+      <div class="input-row">
+        <label class="label" for="salaryInput">你的税前月薪（¥）</label>
+        <div class="input-field"><input type="number" id="salaryInput" placeholder="10000" min="0" inputmode="numeric"></div>
+      </div>
+      <div class="input-row">
+        <label class="label" for="yearsInput">工作了几年的钱要一起算？（年）</label>
+        <div class="input-field"><input type="number" id="yearsInput" placeholder="5" min="0" inputmode="numeric"></div>
+      </div>
+      <div class="input-row">
+        <label class="label" for="hoursInput">每周工作时长（小时，默认 40）</label>
+        <div class="input-field"><input type="number" id="hoursInput" placeholder="40" min="1" inputmode="numeric"></div>
+      </div>
+      <p class="input-error" id="salaryError"></p>
+      <button class="btn btn-primary" id="salarySubmit">算这笔账</button>
+    </div>
+  </div>
+
+  <!-- 屏1 · 总收入 -->
+  <div class="screen" id="incomeScreen">
+    <p class="body-text reveal">工作 <span class="accent" id="yearsEcho">—</span> 年，你挣了</p>
+    <p class="giant" aria-live="polite"><span class="unit" style="font-size:.4em">¥</span><span id="totalIncome">—</span></p>
+    <p class="body-text reveal">是全部。接下来看其中多少，真是你的。</p>
+  </div>
+
+  <!-- 屏2 · 真实时薪 -->
+  <div class="screen" id="hourlyScreen">
+    <p class="body-text reveal">表面月薪一万，真实时薪是另一回事。<br>算上通勤和加班——</p>
+    <p class="giant" aria-live="polite"><span class="unit" style="font-size:.4em">¥</span><span id="realHourly">—</span></p>
+    <p class="body-text reveal">这是你 1 小时的真实价格。</p>
+  </div>
+
+  <!-- 屏3 · 时薪换算 -->
+  <div class="screen" id="convertScreen">
+    <p class="body-text reveal">换句话说——</p>
+    <div class="analogy-list" id="convertList"></div>
+  </div>
+
+  <!-- 屏4 · 反向视角（打字机） -->
+  <div class="screen" id="reverseScreen">
+    <div class="ending-lines" id="reverseType"></div>
+    <p class="body-text">工资是流进来的水。接下来这笔，是流出去的河。</p>
+  </div>
+
+  <!-- 屏5 · 卡片 -->
+  <div class="screen" id="salaryCardScreen">
+    <p class="label reveal">你的卡片 · CARD №.02</p>
+    <div class="card-stage">
+      <canvas id="salaryCardPreview" width="1080" height="1350" aria-label="工资人生卡片预览"></canvas>
+      <div class="card-actions">
+        <button class="btn btn-primary" id="downloadSalaryCard">保存卡片</button>
+        <button class="btn" id="reshuffleSalary">换一组换算</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider-caption">工资是流进来的水。接下来这笔，是流出去的河。</div>
+
+<!-- 第 3 幕 · 房贷真相 -->
+<section id="act3">
+  <div class="act-divider"></div>
+  <div class="act-head screen" style="min-height:40vh; padding-bottom:4vh;">
+    <span class="act-no">03</span>
+    <h2 class="act-title">最后算房子。</h2>
+  </div>
+
+  <!-- 输入屏 -->
+  <div class="screen" id="loanInputScreen">
+    <div class="input-row" style="gap:24px;">
+      <div class="input-row">
+        <label class="label" for="loanAmount">贷款总额（万元）</label>
+        <div class="input-field"><input type="number" id="loanAmount" placeholder="100" min="0" inputmode="numeric"></div>
+      </div>
+      <div class="input-row">
+        <label class="label" for="loanRate">年利率（%，默认 3.6）</label>
+        <div class="input-field"><input type="number" id="loanRate" placeholder="3.6" min="0" step="0.1" inputmode="decimal"></div>
+      </div>
+      <div class="input-row" style="flex-direction:row; gap:24px; flex-wrap:wrap; justify-content:center;">
+        <div class="input-row">
+          <label class="label" for="loanYears">贷款年限</label>
+          <div class="input-field"><input type="number" id="loanYears" placeholder="30" min="1" inputmode="numeric" style="width:120px"></div>
+        </div>
+        <div class="input-row">
+          <label class="label" for="paidYears">已还（年）</label>
+          <div class="input-field"><input type="number" id="paidYears" placeholder="5" min="0" inputmode="numeric" style="width:120px"></div>
+        </div>
+      </div>
+      <div class="input-row">
+        <label class="label">还款方式</label>
+        <div class="seg-control" id="loanTypeSeg">
+          <button class="on" data-type="equal-payment">等额本息</button>
+          <button data-type="equal-principal">等额本金</button>
+        </div>
+      </div>
+      <div class="input-row">
+        <label class="label" for="lumpAmount">假设此刻提前还款（万元，默认 20）</label>
+        <div class="input-field"><input type="number" id="lumpAmount" placeholder="20" min="0" inputmode="numeric"></div>
+      </div>
+      <p class="input-error" id="loanError"></p>
+      <button class="btn btn-primary" id="loanSubmit">算这笔最大的账</button>
+    </div>
+  </div>
+
+  <!-- 屏1 · 月供 -->
+  <div class="screen" id="paymentScreen">
+    <p class="body-text reveal">每个月，你交给银行</p>
+    <p class="giant" aria-live="polite"><span class="unit" style="font-size:.4em">¥</span><span id="monthlyPay">—</span></p>
+    <p class="body-text reveal" id="payTypeEcho">—</p>
+  </div>
+
+  <!-- 屏2 · 已还真相（堆叠条） -->
+  <div class="screen" id="paidScreen">
+    <p class="body-text reveal" style="color:var(--ink)">
+      还了 <span class="accent" id="paidYearsEcho">—</span> 年，一共 ¥<span id="paidTotal">—</span>。<br>
+      其中 <span class="accent" id="paidRatio">—</span>% 是利息。
+    </p>
+    <div class="stacked-bar" aria-label="已还金额中本金与利息的比例">
+      <div class="seg seg-p" id="segPrincipal">本金</div>
+      <div class="seg seg-i" id="segInterest">利息</div>
+    </div>
+    <p class="bar-legend">
+      <span><span class="dot" style="background:var(--ink)"></span>本金 ¥<span id="paidPrincipal">—</span></span>
+      <span><span class="dot" style="background:var(--red)"></span>利息 ¥<span id="paidInterestEcho">—</span></span>
+    </p>
+    <p class="body-text reveal">本金只少了 <span style="color:var(--ink)">¥<span id="paidPrincipal2">—</span></span>。</p>
+  </div>
+
+  <!-- 屏3 · 总利息 -->
+  <div class="screen" id="totalInterestScreen">
+    <p class="body-text reveal">还满 <span id="loanYearsEcho">—</span> 年，利息一共</p>
+    <p class="giant" aria-live="polite"><span class="unit" style="font-size:.4em">¥</span><span id="totalInterest">—</span></p>
+    <p class="body-text reveal" id="carEcho" style="color:var(--ink)">—</p>
+  </div>
+
+  <!-- 屏4 · 提前还款对比（双柱） -->
+  <div class="screen" id="compareScreen">
+    <p class="body-text reveal" style="color:var(--ink)">如果此刻提前还 <span class="accent" id="lumpEcho">—</span> 万：</p>
+    <div class="vbars">
+      <div class="vbar">
+        <div class="col base" id="barBase"></div>
+        <p class="cap">不提前还<br>利息 ¥<span id="interestBase">—</span></p>
+      </div>
+      <div class="vbar">
+        <div class="col alt" id="barAlt"></div>
+        <p class="cap">提前还后<br>利息 ¥<span id="interestAlt">—</span></p>
+      </div>
+    </div>
+    <p class="giant" style="font-size:clamp(40px,7vw,90px)" aria-live="polite">
+      <span class="positive">省 ¥<span id="savings">—</span></span>
+    </p>
+    <p class="body-text reveal" id="wageEcho" style="color:var(--ink)">—</p>
+  </div>
+
+  <!-- 屏5 · 卡片 -->
+  <div class="screen" id="loanCardScreen">
+    <p class="label reveal">你的卡片 · CARD №.03</p>
+    <div class="card-stage">
+      <canvas id="loanCardPreview" width="1080" height="1350" aria-label="房贷真相卡片预览"></canvas>
+      <div class="card-actions">
+        <button class="btn btn-primary" id="downloadLoanCard">保存卡片</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 第 4 幕 · 结尾 -->
+<section id="act4">
+  <div class="act-divider"></div>
+  <div class="screen">
+    <p class="act-no">04</p>
+    <div class="ending-lines">
+      <p class="giant">数完了。</p>
+      <p class="body-text">三笔账，没有一笔是为了焦虑。</p>
+      <p class="body-text">是把剩下的格子，过成想要的样子。</p>
+      <p class="final">—— 把这张卡片，发给那个你想一起吃饭的人</p>
+    </div>
+  </div>
+</section>
+
+<footer>人生账单 · Life Ledger · 所有计算均在本地完成，不上传任何数据</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+/* ================================================================
+   人生账单 · M1 设计系统骨架 + M2 时间余额幕
+   ================================================================ */
+gsap.registerPlugin(ScrollTrigger);
+const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const C = { paper:'#FAF7F2', ink:'#1A1A18', red:'#C0392B', gray:'#8A8577', green:'#2D5A3D', line:'#E5E0D5' };
+const fmt = n => Math.round(n).toLocaleString('en-US');
+
+/* ---------- 工具：数字 count-up（power4.out 落定感） ---------- */
+function countUp(el, to, { duration = 1.4, prefix = '', suffix = '', format = fmt } = {}) {
+  if (REDUCED) { el.textContent = prefix + format(to) + suffix; return; }
+  const obj = { v: 0 };
+  gsap.to(obj, {
+    v: to, duration, ease: 'power4.out',
+    onUpdate: () => { el.textContent = prefix + format(obj.v) + suffix; },
+    onComplete: () => { el.textContent = prefix + format(to) + suffix;
+      el.setAttribute('aria-label', prefix + format(to) + suffix); }
+  });
+}
+
+/* ---------- 通用：.reveal 入场（toggle 一次性） ---------- */
+document.querySelectorAll('.reveal').forEach(el => {
+  if (REDUCED) { el.style.opacity = 1; el.style.transform = 'none'; return; }
+  gsap.to(el, {
+    opacity: 1, y: 0, duration: .9, ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 82%', once: true }
+  });
+});
+
+/* ---------- 幕导航 scroll-spy ---------- */
+['hero','act1','act2','act3','act4'].forEach(id => {
+  ScrollTrigger.create({
+    trigger: '#' + id, start: 'top 50%', end: 'bottom 50%',
+    onToggle: self => {
+      if (self.isActive) {
+        document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('active', a.dataset.spy === id));
+      }
+    }
+  });
+});
+
+/* ---------- Hero 动画 ---------- */
+(function heroIntro() {
+  if (REDUCED) return;
+  const tl = gsap.timeline({ delay: .2 });
+  tl.to('#hero .title-line span', { y: 0, duration: .9, stagger: .15, ease: 'power3.out' })
+    .to('#heroSub', { opacity: 1, duration: .8 }, '-=.4')
+    .to('#heartbeat', { opacity: 1, duration: .8 }, '-=.4');
+  // Hero 内容上移淡出（翻页进账本）
+  gsap.to('#hero > *:not(#scroll-hint)', {
+    y: -60, opacity: 0, ease: 'none',
+    scrollTrigger: { trigger: '#hero', start: 'bottom 90%', end: 'bottom 40%', scrub: true }
+  });
+})();
+
+/* ---------- Hero 心跳数字（时薪示例循环） ---------- */
+(function heartbeat() {
+  const examples = [23.5, 42.6, 68, 31.2, 55, 88.5, 37.8];
+  const el = document.getElementById('hbNum');
+  let i = 0;
+  el.textContent = '¥ ' + examples[0].toFixed(1);
+  if (REDUCED) return;
+  setInterval(() => {
+    i = (i + 1) % examples.length;
+    const obj = { v: examples[(i - 1 + examples.length) % examples.length] };
+    gsap.to(obj, { v: examples[i], duration: 1.4, ease: 'power4.out',
+      onUpdate: () => el.textContent = '¥ ' + obj.v.toFixed(1) });
+  }, 2400);
+})();
+
+/* ---------- 幕分隔线扫过 ---------- */
+document.querySelectorAll('.act-divider').forEach(el => {
+  if (REDUCED) { el.style.transform = 'scaleX(1)'; return; }
+  gsap.to(el, { scaleX: 1, duration: .9, ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 85%', once: true } });
+});
+
+/* ================================================================
+   M2 · 时间余额：算法
+   ================================================================ */
+const LIFE_YEARS = 80, COLS = 52, ROWS = 80; // 一格 = 一周
+let result = null; // { birth, daysAlive, daysLeft, weeksAlive, pct, yearsLeft }
+
+function computeTime(birthStr) {
+  const birth = new Date(birthStr + '-01T00:00:00');
+  const now = new Date();
+  if (isNaN(birth) || birth > now) return null;
+  const end = new Date(birth); end.setFullYear(end.getFullYear() + LIFE_YEARS);
+  const DAY = 86400000;
+  const daysAlive = Math.floor((now - birth) / DAY);
+  const totalDays = Math.floor((end - birth) / DAY);
+  const daysLeft = totalDays - daysAlive;
+  const weeksAlive = Math.floor(daysAlive / 7);
+  const pct = Math.min(100, weeksAlive / (COLS * ROWS) * 100);
+  return { birth, daysAlive, daysLeft, weeksAlive, pct, yearsLeft: daysLeft / 365.25 };
+}
+
+/* ---------- 类比池（结构化：label + 数字 + 单位，DOM 与卡片共用） ---------- */
+function buildAnalogies(r) {
+  const pool = [
+    { w: 3, label: '一年回家 2 次，还能和爸妈吃约', num: () => r.yearsLeft * 4, unit: '顿饭' },
+    { w: 3, label: '每天看一次日落，还能看约',     num: () => r.daysLeft,       unit: '次' },
+    { w: 2, label: '每周读一本书，还能读',         num: () => r.yearsLeft * 52, unit: '本' },
+    { w: 2, label: '一年去一个地方，还能去',       num: () => r.yearsLeft,      unit: '个' },
+    { w: 2, label: '一年过一次生日，只剩',         num: () => Math.floor(r.yearsLeft), unit: '个' },
+    { w: 1, label: '每周看一场电影，还能看',       num: () => r.daysLeft / 7,   unit: '场' },
+    { w: 1, label: '每天通勤 1 小时，还要通勤',   num: () => r.daysLeft,       unit: '天' },
+  ];
+  // 加权抽取 3 条不重复
+  const bag = pool.flatMap(p => Array(p.w).fill(p));
+  const picked = [];
+  while (picked.length < 3 && bag.length) {
+    const p = bag.splice(Math.floor(Math.random() * bag.length), 1)[0];
+    if (!picked.includes(p)) { picked.push(p); for (let i = bag.length - 1; i >= 0; i--) if (bag[i] === p) bag.splice(i, 1); }
+  }
+  return picked.map(p => ({ label: p.label, num: fmt(p.num()), unit: p.unit }));
+}
+
+let lastAnalogies = [];
+
+function renderAnalogies() {
+  const list = document.getElementById('analogyList');
+  list.innerHTML = '';
+  lastAnalogies = buildAnalogies(result);
+  lastAnalogies.forEach(a => {
+    const div = document.createElement('div');
+    div.className = 'analogy-item';
+    div.innerHTML = `<span class="arrow">→</span><span>${a.label} <span class="num">${a.num}</span> ${a.unit}</span>`;
+    list.appendChild(div);
+  });
+  const items = list.querySelectorAll('.analogy-item');
+  if (REDUCED) { items.forEach(i => { i.style.opacity = 1; i.style.transform = 'none'; }); return; }
+  gsap.to(items, { opacity: 1, y: 0, duration: .6, stagger: .25, ease: 'power3.out',
+    scrollTrigger: { trigger: list, start: 'top 80%', once: true } });
+}
+
+/* ---------- 人生格子图（Canvas，scrub 逐行点亮） ---------- */
+const gridCanvas = document.getElementById('gridCanvas');
+const gtx = gridCanvas.getContext('2d');
+const GAP = 4, CELL = 17; // 52*17 + 51*4 = 1088 ≈ 1092 宽
+const gridState = { progress: REDUCED ? 1 : 0 };
+
+function drawGrid() {
+  const rowsLit = Math.floor(gridState.progress * ROWS);
+  gtx.clearRect(0, 0, gridCanvas.width, gridCanvas.height);
+  const lit = result ? Math.floor(result.weeksAlive / COLS) : 0;
+  for (let row = 0; row < ROWS; row++) {
+    const isLit = result && row < Math.min(lit, rowsLit);
+    gtx.fillStyle = isLit ? C.red : (result ? 'rgba(192,57,43,.14)' : C.line);
+    for (let col = 0; col < COLS; col++) {
+      gtx.fillRect(col * (CELL + GAP), row * (CELL + GAP), CELL, CELL);
+    }
+  }
+  const pctEl = document.getElementById('gridPct');
+  if (result) {
+    const shown = Math.min(result.pct, gridState.progress * 100);
+    pctEl.textContent = Math.round(shown) + '%';
+  } else pctEl.textContent = '—';
+}
+drawGrid();
+
+ScrollTrigger.create({
+  trigger: '#gridScreen', start: 'top 70%', end: 'bottom 40%', scrub: .5,
+  onUpdate: self => { gridState.progress = self.progress; drawGrid(); }
+});
+
+/* ---------- 计算完成后的全链路 ---------- */
+function runTimeLedger({ scroll = true } = {}) {
+  const r = computeTime(document.getElementById('birthInput').value);
+  const err = document.getElementById('birthError');
+  if (!r) { err.textContent = '看来你还没出生。试试换个时间？'; return; }
+  err.textContent = '';
+  result = r;
+
+  // URL hash 分享（无后端复现结果）
+  history.replaceState(null, '', '#/time/' + document.getElementById('birthInput').value);
+
+  // 数字落定
+  countUp(document.getElementById('daysAlive'), r.daysAlive);
+  countUp(document.getElementById('daysLeft'), r.daysLeft);
+  document.getElementById('daysLeft').setAttribute('aria-label', fmt(r.daysLeft) + ' 天');
+  document.getElementById('pctEcho').textContent = Math.round(r.pct) + '%';
+
+  drawGrid();
+  renderAnalogies();
+  renderCard();
+
+  if (scroll) document.getElementById('daysScreen').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth' });
+}
+
+document.getElementById('birthSubmit').addEventListener('click', () => runTimeLedger());
+document.getElementById('birthInput').addEventListener('keydown', e => { if (e.key === 'Enter') runTimeLedger(); });
+document.getElementById('reshuffle').addEventListener('click', () => { renderAnalogies(); renderCard(); });
+
+/* ================================================================
+   卡片：Canvas 绘制版式 A（1080×1350），PNG 导出
+   ================================================================ */
+const SERIF = "'Fraunces','Songti SC','Noto Serif SC',serif";
+const SANS  = "'Inter','PingFang SC',sans-serif";
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+
+function drawCard(ctx, W, H, r, analogies) {
+  const s = W / 1080;               // 导出 2 倍图时整体缩放
+  const M = 96 * s;                 // 安全边距
+  const line = (x1, y1, x2, y2) => { ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); };
+
+  // 纸底
+  ctx.fillStyle = C.paper; ctx.fillRect(0, 0, W, H);
+  ctx.textBaseline = 'alphabetic';
+
+  // 左缘竖排编辑注脚（杂志侧栏）
+  ctx.save();
+  ctx.translate(36 * s, H / 2); ctx.rotate(-Math.PI / 2);
+  ctx.font = `500 ${16 * s}px ${SANS}`;
+  ctx.fillStyle = 'rgba(138,133,119,.5)';
+  ctx.textAlign = 'center';
+  ctx.fillText('T I M E   B A L A N C E   ·   A C T   0 1', 0, 0);
+  ctx.restore();
+
+  // 顶栏
+  ctx.font = `500 ${21 * s}px ${SANS}`; ctx.fillStyle = C.gray;
+  ctx.textAlign = 'left';  ctx.fillText('人 生 账 单 · LIFE LEDGER', M, M + 6 * s);
+  ctx.textAlign = 'right'; ctx.fillText('№.01', W - M, M + 6 * s);
+  ctx.strokeStyle = C.line; ctx.lineWidth = 2 * s;
+  line(M, M + 40 * s, W - M, M + 40 * s);
+
+  // 标题
+  ctx.textAlign = 'center';
+  ctx.font = `520 ${62 * s}px ${SERIF}`; ctx.fillStyle = C.ink;
+  ctx.fillText('我的时间余额', W / 2, M + 148 * s);
+
+  // 巨数：已活天数
+  ctx.font = `560 ${170 * s}px ${SERIF}`;
+  ctx.fillText(fmt(r.daysAlive), W / 2, M + 348 * s);
+  ctx.font = `400 ${25 * s}px ${SANS}`; ctx.fillStyle = C.gray;
+  ctx.fillText('天 · 已经活了', W / 2, M + 406 * s);
+
+  // 迷你格子图（52×22，点亮行数按比例换算）
+  const rows = 22, cols = 52, gap = 4 * s, cell = 15 * s;
+  const gw = cols * cell + (cols - 1) * gap, gh = rows * cell + (rows - 1) * gap;
+  const gx = (W - gw) / 2, gy = M + 446 * s;
+  const litRows = Math.round(r.weeksAlive / (52 * 80) * rows);
+  for (let row = 0; row < rows; row++) {
+    ctx.fillStyle = row < litRows ? C.red : 'rgba(192,57,43,.13)';
+    for (let col = 0; col < cols; col++)
+      ctx.fillRect(gx + col * (cell + gap), gy + row * (cell + gap), cell, cell);
+  }
+
+  // 百分比 + 注
+  ctx.font = `560 ${56 * s}px ${SERIF}`; ctx.fillStyle = C.red;
+  ctx.fillText(Math.round(r.pct) + '%', W / 2, gy + gh + 84 * s);
+  ctx.font = `400 ${22 * s}px ${SANS}`; ctx.fillStyle = C.gray;
+  ctx.fillText('的人生格子，已经点亮', W / 2, gy + gh + 126 * s);
+
+  // 红印章（双圈 + 斜置）
+  ctx.save();
+  ctx.translate(W - M - 78 * s, gy + gh + 78 * s); ctx.rotate(-0.22);
+  ctx.strokeStyle = C.red; ctx.lineWidth = 3 * s;
+  ctx.beginPath(); ctx.arc(0, 0, 56 * s, 0, Math.PI * 2); ctx.stroke();
+  ctx.lineWidth = 1.5 * s;
+  ctx.beginPath(); ctx.arc(0, 0, 46 * s, 0, Math.PI * 2); ctx.stroke();
+  ctx.fillStyle = C.red; ctx.font = `600 ${21 * s}px ${SANS}`; ctx.textAlign = 'center';
+  ctx.fillText('时间余额', 0, 7 * s);
+  ctx.restore();
+
+  // 类比两条（左对齐：灰标签 + 红衬线数字）
+  ctx.textAlign = 'left';
+  const ay = M + 1078 * s;
+  ctx.strokeStyle = C.line;
+  line(M, ay - 42 * s, W - M, ay - 42 * s);
+  analogies.slice(0, 2).forEach((a, i) => {
+    const y = ay + i * 56 * s;
+    let x = M + 4 * s;
+    ctx.font = `400 ${27 * s}px ${SANS}`; ctx.fillStyle = C.ink;
+    ctx.fillText('→  ' + a.label, x, y);
+    x += ctx.measureText('→  ' + a.label).width + 10 * s;
+    ctx.font = `560 ${32 * s}px ${SERIF}`; ctx.fillStyle = C.red;
+    ctx.fillText(a.num, x, y);
+    x += ctx.measureText(a.num).width + 8 * s;
+    ctx.font = `400 ${27 * s}px ${SANS}`; ctx.fillStyle = C.ink;
+    ctx.fillText(a.unit, x, y);
+  });
+
+  // 底部引流
+  ctx.strokeStyle = C.line;
+  line(M, H - M * 0.95, W - M, H - M * 0.95);
+  ctx.font = `400 ${20 * s}px ${SANS}`; ctx.fillStyle = C.gray; ctx.textAlign = 'center';
+  ctx.fillText('人生账单 · Life Ledger — 把剩下的格子，过成想要的样子', W / 2, H - M * 0.45);
+}
+
+function renderCard() {
+  if (!result) return;
+  const preview = document.getElementById('cardPreview');
+  const ptx = preview.getContext('2d');
+  drawCard(ptx, preview.width, preview.height, result, lastAnalogies);
+}
+
+document.getElementById('downloadCard').addEventListener('click', () => {
+  if (!result) return;
+  // 2 倍导出，保证清晰度
+  const out = document.createElement('canvas');
+  out.width = 2160; out.height = 2700;
+  drawCard(out.getContext('2d'), out.width, out.height, result, lastAnalogies);
+  out.toBlob(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '人生账单-时间余额.png';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }, 'image/png');
+});
+
+/* ================================================================
+   M3 · 工资人生：算法 + 换算 + CARD №.02
+   ================================================================ */
+const WORKDAYS_PER_MONTH = 21.75; // 法定月计薪天数
+const COMMUTE_HOURS_PER_DAY = 1.5; // 通勤折算
+let salaryResult = null; // { monthly, years, weeklyHours, totalIncome, realHourly }
+window.ledgerMonthly = null; // 跨幕联动：留给 M4 房贷幕换算「X 年工资」
+
+function computeSalary(monthly, years, weeklyHours) {
+  if (!(monthly > 0)) return '月薪得大于 0 吧。';
+  if (!(years > 0)) return '至少算一年吧。';
+  const totalIncome = monthly * 12 * years;
+  const dailyHours = weeklyHours / 5 + COMMUTE_HOURS_PER_DAY;
+  const realHourly = monthly / (dailyHours * WORKDAYS_PER_MONTH);
+  salaryResult = { monthly, years, weeklyHours, totalIncome, realHourly, conversions: null };
+  window.ledgerMonthly = monthly;
+  return null;
+}
+
+/* ---------- 时薪换算池：按价格带分层，每层抽 1 条 ---------- */
+function formatPrice(price) { return '¥' + fmt(price); }
+function formatCost(hours, weeklyHours) {
+  if (hours < 1) return Math.round(hours * 60) + ' 分钟';
+  if (hours < 8) return Math.round(hours * 10) / 10 + ' 小时';
+  if (hours < weeklyHours * 1.5) return Math.round(hours / 8 * 10) / 10 + ' 个工作日';
+  return Math.round(hours / weeklyHours * 10) / 10 + ' 周';
+}
+
+function buildConversions(r) {
+  const pool = [
+    { tier: 1, label: '一杯奶茶',  price: 20,   heal: false },
+    { tier: 1, label: '一顿沙县',  price: 20,   heal: true },
+    { tier: 1, label: '一顿火锅',  price: 150,  heal: false },
+    { tier: 2, label: '一双球鞋',  price: 1299, heal: false },
+    { tier: 2, label: '一张演唱会门票', price: 1800, heal: false },
+    { tier: 3, label: '一部 iPhone', price: 8999, heal: false },
+    { tier: 3, label: '一趟日本旅行', price: 15000, heal: false },
+  ];
+  // 每个价格带抽 1 条，保证从奶茶到旅行的层次
+  const picked = [1, 2, 3].map(t => {
+    const cands = pool.filter(p => p.tier === t);
+    return cands[Math.floor(Math.random() * cands.length)];
+  }).sort(() => Math.random() - .5);
+  return picked.map(p => {
+    const hours = p.price / r.realHourly;
+    return {
+      label: p.heal
+        ? `${p.label} ${formatPrice(p.price)}，你只卖`
+        : `${p.label} ${formatPrice(p.price)} = 你`,
+      num: formatCost(hours, r.weeklyHours),
+      full: `${p.label} ${formatPrice(p.price)} ${p.heal ? '，你只卖' : '= 你'} ${formatCost(hours, r.weeklyHours)}`
+    };
+  });
+}
+
+function renderConversions() {
+  const list = document.getElementById('convertList');
+  list.innerHTML = '';
+  if (!salaryResult.conversions) salaryResult.conversions = buildConversions(salaryResult);
+  salaryResult.conversions.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'analogy-item';
+    div.innerHTML = `<span class="arrow">→</span><span>${c.label} <span class="num">${c.num}</span></span>`;
+    list.appendChild(div);
+  });
+  const items = list.querySelectorAll('.analogy-item');
+  if (REDUCED) { items.forEach(i => { i.style.opacity = 1; i.style.transform = 'none'; }); return; }
+  gsap.to(items, { opacity: 1, y: 0, duration: .6, stagger: .25, ease: 'power3.out',
+    scrollTrigger: { trigger: list, start: 'top 80%', once: true } });
+}
+
+/* ---------- 反向视角：全页唯一的打字机 ---------- */
+function typewriteLines(el, lines, speed = 35) {
+  el.innerHTML = '';
+  if (REDUCED) { lines.forEach(t => { const p = document.createElement('p'); p.textContent = t; el.appendChild(p); }); return; }
+  let li = 0, ci = 0, p = null;
+  (function tick() {
+    if (li >= lines.length) return;
+    if (ci === 0) { p = document.createElement('p'); p.style.cssText = 'font-size:clamp(20px,3vw,30px);color:var(--ink)'; el.appendChild(p); }
+    p.textContent = lines[li].slice(0, ++ci);
+    if (ci >= lines[li].length) { li++; ci = 0; setTimeout(tick, 500); }
+    else setTimeout(tick, speed);
+  })();
+}
+
+let reverseTriggered = false;
+function runSalaryLedger({ scroll = true } = {}) {
+  const monthly = parseFloat(document.getElementById('salaryInput').value);
+  const years = parseFloat(document.getElementById('yearsInput').value);
+  const whRaw = parseFloat(document.getElementById('hoursInput').value);
+  const weeklyHours = whRaw > 0 ? whRaw : 40;
+  const err = computeSalary(monthly, years, weeklyHours);
+  const errEl = document.getElementById('salaryError');
+  if (err) { errEl.textContent = err; return; }
+  errEl.textContent = '';
+  const r = salaryResult;
+
+  history.replaceState(null, '', `#/salary/${monthly}-${years}-${weeklyHours}`);
+
+  document.getElementById('yearsEcho').textContent = years;
+  countUp(document.getElementById('totalIncome'), r.totalIncome);
+  countUp(document.getElementById('realHourly'), r.realHourly, { format: v => v.toFixed(1) });
+
+  r.conversions = null; // 重新抽签
+  renderConversions();
+  renderSalaryCard();
+
+  // 反向视角打字机（滚动到屏4时触发一次）
+  if (!reverseTriggered) {
+    reverseTriggered = true;
+    const lines = [
+      '想买的东西越来越贵，时间还是那么多。',
+      '要么，多卖点时间。',
+      '要么，让 1 小时更值钱。'
+    ];
+    ScrollTrigger.create({
+      trigger: '#reverseScreen', start: 'top 60%', once: true,
+      onEnter: () => typewriteLines(document.getElementById('reverseType'), lines)
+    });
+  }
+
+  if (scroll) document.getElementById('incomeScreen').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth' });
+}
+
+document.getElementById('salarySubmit').addEventListener('click', () => runSalaryLedger());
+document.getElementById('reshuffleSalary').addEventListener('click', () => {
+  salaryResult.conversions = null; renderConversions(); renderSalaryCard();
+});
+
+/* ---------- CARD №.02 · 版式 A 变体 ---------- */
+function drawSalaryCard(ctx, W, H, r, conversions) {
+  const s = W / 1080, M = 96 * s;
+  const line = (x1, y1, x2, y2) => { ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); };
+
+  ctx.fillStyle = C.paper; ctx.fillRect(0, 0, W, H);
+  ctx.textBaseline = 'alphabetic';
+
+  // 左缘竖排侧注
+  ctx.save();
+  ctx.translate(36 * s, H / 2); ctx.rotate(-Math.PI / 2);
+  ctx.font = `500 ${16 * s}px ${SANS}`;
+  ctx.fillStyle = 'rgba(138,133,119,.5)';
+  ctx.textAlign = 'center';
+  ctx.fillText('S A L A R Y   L I F E   ·   A C T   0 2', 0, 0);
+  ctx.restore();
+
+  // 顶栏
+  ctx.font = `500 ${21 * s}px ${SANS}`; ctx.fillStyle = C.gray;
+  ctx.textAlign = 'left';  ctx.fillText('人 生 账 单 · LIFE LEDGER', M, M + 6 * s);
+  ctx.textAlign = 'right'; ctx.fillText('№.02', W - M, M + 6 * s);
+  ctx.strokeStyle = C.line; ctx.lineWidth = 2 * s;
+  line(M, M + 40 * s, W - M, M + 40 * s);
+
+  // 标题
+  ctx.textAlign = 'center';
+  ctx.font = `520 ${62 * s}px ${SERIF}`; ctx.fillStyle = C.ink;
+  ctx.fillText('我的工资人生', W / 2, M + 142 * s);
+
+  // 巨数：总收入
+  ctx.font = `560 ${118 * s}px ${SERIF}`;
+  ctx.fillText('¥' + fmt(r.totalIncome), W / 2, M + 302 * s);
+  ctx.font = `400 ${24 * s}px ${SANS}`; ctx.fillStyle = C.gray;
+  ctx.fillText(`工作 ${r.years} 年的总收入`, W / 2, M + 356 * s);
+
+  // 分隔
+  line(M, M + 412 * s, W - M, M + 412 * s);
+
+  // 真实时薪
+  ctx.font = `560 ${92 * s}px ${SERIF}`; ctx.fillStyle = C.red;
+  ctx.fillText('¥' + r.realHourly.toFixed(1), W / 2, M + 516 * s);
+  ctx.font = `400 ${24 * s}px ${SANS}`; ctx.fillStyle = C.gray;
+  ctx.fillText('你 1 小时的真实价格', W / 2, M + 564 * s);
+
+  // 换算三条
+  const cy = M + 668 * s;
+  ctx.strokeStyle = C.line;
+  line(M, cy - 44 * s, W - M, cy - 44 * s);
+  ctx.textAlign = 'left';
+  conversions.forEach((c, i) => {
+    const y = cy + i * 66 * s;
+    let x = M + 4 * s;
+    ctx.font = `400 ${28 * s}px ${SANS}`; ctx.fillStyle = C.ink;
+    ctx.fillText('→  ' + c.label, x, y);
+    x += ctx.measureText('→  ' + c.label).width + 10 * s;
+    ctx.font = `560 ${34 * s}px ${SERIF}`; ctx.fillStyle = C.red;
+    ctx.fillText(c.num, x, y);
+  });
+
+  // 红印章
+  ctx.save();
+  ctx.translate(W - M - 74 * s, M + 546 * s); ctx.rotate(-0.22);
+  ctx.strokeStyle = C.red; ctx.lineWidth = 3 * s;
+  ctx.beginPath(); ctx.arc(0, 0, 54 * s, 0, Math.PI * 2); ctx.stroke();
+  ctx.lineWidth = 1.5 * s;
+  ctx.beginPath(); ctx.arc(0, 0, 44 * s, 0, Math.PI * 2); ctx.stroke();
+  ctx.fillStyle = C.red; ctx.font = `600 ${20 * s}px ${SANS}`; ctx.textAlign = 'center';
+  ctx.fillText('工资人生', 0, 7 * s);
+  ctx.restore();
+
+  // 底部引流
+  ctx.strokeStyle = C.line;
+  line(M, H - M * 0.95, W - M, H - M * 0.95);
+  ctx.font = `400 ${20 * s}px ${SANS}`; ctx.fillStyle = C.gray; ctx.textAlign = 'center';
+  ctx.fillText('人生账单 · Life Ledger — 要么多卖点时间，要么让 1 小时更值钱', W / 2, H - M * 0.45);
+}
+
+function renderSalaryCard() {
+  if (!salaryResult) return;
+  const preview = document.getElementById('salaryCardPreview');
+  drawCardShell(); // 确保已抽好换算
+  drawSalaryCard(preview.getContext('2d'), preview.width, preview.height, salaryResult, salaryResult.conversions);
+}
+function drawCardShell() { if (!salaryResult.conversions) salaryResult.conversions = buildConversions(salaryResult); }
+
+document.getElementById('downloadSalaryCard').addEventListener('click', () => {
+  if (!salaryResult) return;
+  drawCardShell();
+  const out = document.createElement('canvas');
+  out.width = 2160; out.height = 2700;
+  drawSalaryCard(out.getContext('2d'), out.width, out.height, salaryResult, salaryResult.conversions);
+  out.toBlob(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '人生账单-工资人生.png';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }, 'image/png');
+});
+
+/* ================================================================
+   M4 · 房贷真相：双算法摊销 + 提前还款对比 + CARD №.03
+   ================================================================ */
+let loanResult = null;
+let loanType = 'equal-payment';
+
+document.querySelectorAll('#loanTypeSeg button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#loanTypeSeg button').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    loanType = btn.dataset.type;
+  });
+});
+
+function simulateSchedule(P, r, n, type) {
+  const principalFixed = P / n;
+  const paymentEP = r > 0 ? P * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1) : P / n;
+  const schedule = [];
+  let balance = P;
+  for (let m = 1; m <= n && balance > 0.005; m++) {
+    const interest = balance * r;
+    let principal, payment;
+    if (type === 'equal-payment') {
+      payment = paymentEP;
+      principal = payment - interest;
+      if (principal > balance) { principal = balance; payment = principal + interest; }
+    } else {
+      principal = Math.min(principalFixed, balance);
+      payment = principal + interest;
+    }
+    schedule.push({ interest, principal, payment });
+    balance -= principal;
+  }
+  return schedule;
+}
+
+function computeLoan(amountWan, annualRate, years, paidYears, type, lumpWan) {
+  if (!(amountWan > 0)) return { err: '贷款得大于 0 吧。' };
+  if (!(years > 0)) return { err: '年限得大于 0 吧。' };
+  if (!(annualRate >= 0)) return { err: '利率不能是负数。' };
+  if (paidYears >= years) return { err: '这笔贷款已经还完了，恭喜。去第二幕看看时薪？' };
+  if (paidYears < 0) return { err: '已还年数不能是负数。' };
+
+  const P = amountWan * 10000, r = annualRate / 100 / 12, n = Math.round(years * 12);
+  const paid = Math.min(Math.round(paidYears * 12), n);
+  const sched = simulateSchedule(P, r, n, type);
+
+  let paidInterest = 0, paidPrincipal = 0;
+  sched.slice(0, paid).forEach(s => { paidInterest += s.interest; paidPrincipal += s.principal; });
+  const totalInterest = sched.reduce((a, s) => a + s.interest, 0);
+
+  // 提前还款情景：此刻还 lump，月供不变缩短期限（本息）/ 月本金不变（本金）
+  const balanceNow = P - paidPrincipal;
+  const lump = Math.min(Math.max((lumpWan || 0) * 10000, 0), balanceNow);
+  let futureInterest = 0;
+  if (lump > 0) {
+    let bal = balanceNow - lump;
+    if (type === 'equal-payment') {
+      const pay = sched[0].payment;
+      while (bal > 0.005) {
+        const interest = bal * r;
+        let principal = pay - interest;
+        if (principal > bal) principal = bal;
+        futureInterest += interest;
+        bal -= principal;
+      }
+    } else {
+      const pf = P / n;
+      while (bal > 0.005) {
+        const interest = bal * r;
+        const principal = Math.min(pf, bal);
+        futureInterest += interest;
+        bal -= principal;
+      }
+    }
+  }
+  const newTotalInterest = paidInterest + futureInterest;
+  return {
+    monthly: sched[0].payment, paidYears, type, lump,
+    paidTotal: paidInterest + paidPrincipal, paidInterest, paidPrincipal,
+    interestRatio: (paidInterest + paidPrincipal) > 0 ? paidInterest / (paidInterest + paidPrincipal) * 100 : 0,
+    totalInterest, newTotalInterest, savings: totalInterest - newTotalInterest
+  };
+}
+
+/* ---------- 利息类比物（池 C） ---------- */
+function interestNoun(amount) {
+  if (amount >= 600000) return '一辆宝马 3 系';
+  if (amount >= 300000) return '一辆 Model Y';
+  if (amount >= 150000) return '一辆比亚迪秦';
+  if (amount >= 50000)  return '一辆五菱宏光 MINI';
+  return '一辆不错的二手车';
+}
+
+function runLoanLedger({ scroll = true } = {}) {
+  const amountWan = parseFloat(document.getElementById('loanAmount').value);
+  const rateRaw = parseFloat(document.getElementById('loanRate').value);
+  const years = parseFloat(document.getElementById('loanYears').value);
+  const paidYears = parseFloat(document.getElementById('paidYears').value) || 0;
+  const lumpWan = parseFloat(document.getElementById('lumpAmount').value) || 0;
+  const rate = rateRaw >= 0 ? rateRaw : 3.6;
+  const errEl = document.getElementById('loanError');
+
+  const res = computeLoan(amountWan, rate, years || 30, paidYears, loanType, lumpWan);
+  if (res.err) { errEl.textContent = res.err; return; }
+  errEl.textContent = '';
+  loanResult = res;
+
+  history.replaceState(null, '', `#/loan/${amountWan}-${rate}-${years || 30}-${paidYears}-${loanType === 'equal-payment' ? 0 : 1}-${lumpWan}`);
+
+  // 屏1 · 月供
+  countUp(document.getElementById('monthlyPay'), res.monthly);
+  document.getElementById('payTypeEcho').textContent =
+    (loanType === 'equal-payment' ? '等额本息 · 每月相同' : '等额本金 · 首月最多，逐月递减');
+
+  // 屏2 · 已还真相
+  document.getElementById('paidYearsEcho').textContent = paidYears;
+  countUp(document.getElementById('paidTotal'), res.paidTotal);
+  countUp(document.getElementById('paidRatio'), res.interestRatio, { format: v => Math.round(v) });
+  countUp(document.getElementById('paidInterestEcho'), res.paidInterest);
+  countUp(document.getElementById('paidPrincipal'), res.paidPrincipal);
+  countUp(document.getElementById('paidPrincipal2'), res.paidPrincipal);
+
+  // 堆叠条（利息段最后轻震）
+  const pPct = 100 - res.interestRatio, iPct = res.interestRatio;
+  const segP = document.getElementById('segPrincipal'), segI = document.getElementById('segInterest');
+  segP.textContent = '本金 ' + Math.round(pPct) + '%';
+  segI.textContent = '利息 ' + Math.round(iPct) + '%';
+  if (REDUCED) { segP.style.width = pPct + '%'; segI.style.width = iPct + '%'; }
+  else {
+    gsap.set(segP, { width: 0 }); gsap.set(segI, { width: 0 });
+    gsap.timeline({ scrollTrigger: { trigger: '.stacked-bar', start: 'top 75%', once: true } })
+      .to(segP, { width: pPct + '%', duration: .9, ease: 'power3.out' })
+      .to(segI, { width: iPct + '%', duration: .8, ease: 'power3.out' }, '-=.5')
+      .to(segI, { rotation: .5, yoyo: true, repeat: 3, duration: .06 }); // 利息段轻震
+  }
+
+  // 屏3 · 总利息
+  document.getElementById('loanYearsEcho').textContent = years || 30;
+  countUp(document.getElementById('totalInterest'), res.totalInterest);
+  document.getElementById('carEcho').textContent = '差不多是' + interestNoun(res.totalInterest) + '。';
+
+  // 屏4 · 提前还款对比
+  document.getElementById('lumpEcho').textContent = lumpWan || 0;
+  countUp(document.getElementById('interestBase'), res.totalInterest);
+  countUp(document.getElementById('interestAlt'), res.newTotalInterest);
+  countUp(document.getElementById('savings'), res.savings);
+  const maxI = Math.max(res.totalInterest, res.newTotalInterest, 1);
+  const hBase = Math.max(res.totalInterest / maxI * 300, 6);
+  const hAlt  = Math.max(res.newTotalInterest / maxI * 300, 6);
+  const barBase = document.getElementById('barBase'), barAlt = document.getElementById('barAlt');
+  if (REDUCED) { barBase.style.height = hBase + 'px'; barAlt.style.height = hAlt + 'px'; }
+  else {
+    gsap.set([barBase, barAlt], { height: 0 });
+    gsap.timeline({ scrollTrigger: { trigger: '.vbars', start: 'top 75%', once: true } })
+      .to(barBase, { height: hBase, duration: .9, ease: 'power3.out' })
+      .to(barAlt,  { height: hAlt,  duration: .9, ease: 'power3.out' }, '-=.6');
+  }
+  // 跨幕联动彩蛋：白赚 X 年工资
+  const wageEcho = document.getElementById('wageEcho');
+  if (window.ledgerMonthly > 0) {
+    const yearsWage = res.savings / (window.ledgerMonthly * 12);
+    wageEcho.innerHTML = yearsWage >= 0.1
+      ? `等于，白赚 <span class="positive">${yearsWage.toFixed(1)} 年</span>工资。`
+      : '省下的还不够一个月工资，但方向是对的。';
+  } else {
+    wageEcho.textContent = '等于，少给银行打几年工。';
+  }
+
+  renderLoanCard();
+  if (scroll) document.getElementById('paymentScreen').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth' });
+}
+
+document.getElementById('loanSubmit').addEventListener('click', () => runLoanLedger());
+
+/* ---------- CARD №.03 · 版式 B 报纸头版 ---------- */
+function drawLoanCard(ctx, W, H, r) {
+  const s = W / 1080, M = 96 * s;
+  const line = (x1, y1, x2, y2) => { ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); };
+
+  ctx.fillStyle = C.paper; ctx.fillRect(0, 0, W, H);
+  ctx.textBaseline = 'alphabetic';
+
+  // 顶栏
+  ctx.font = `500 ${21 * s}px ${SANS}`; ctx.fillStyle = C.gray;
+  ctx.textAlign = 'left';  ctx.fillText('人 生 账 单 · LIFE LEDGER', M, M + 6 * s);
+  ctx.textAlign = 'right'; ctx.fillText('№.03', W - M, M + 6 * s);
+  ctx.strokeStyle = C.ink; ctx.lineWidth = 3 * s;
+  line(M, M + 40 * s, W - M, M + 40 * s);
+  ctx.lineWidth = 1 * s;
+  line(M, M + 50 * s, W - M, M + 50 * s);
+
+  // 通栏大标题
+  ctx.textAlign = 'center';
+  ctx.font = `560 ${96 * s}px ${SERIF}`; ctx.fillStyle = C.ink;
+  ctx.fillText('房 贷 真 相', W / 2, M + 160 * s);
+  ctx.font = `400 ${22 * s}px ${SANS}`; ctx.fillStyle = C.gray;
+  ctx.fillText(`${r.type === 'equal-payment' ? '等额本息' : '等额本金'} · 已还 ${r.paidYears} 年`, W / 2, M + 206 * s);
+  ctx.strokeStyle = C.line; ctx.lineWidth = 1 * s;
+  line(M, M + 240 * s, W - M, M + 240 * s);
+
+  // 双栏数据行（左标签 / 右数值）
+  const rows = [
+    { label: '每月交给银行', value: '¥' + fmt(r.monthly), color: C.ink },
+    { label: `已还 ${r.paidYears} 年 · 利息占`, value: Math.round(r.interestRatio) + '%', color: C.red },
+    { label: '还满总利息', value: '¥' + fmt(r.totalInterest), color: C.ink },
+    { label: '此刻提前还款可省', value: r.savings > 0 ? '¥' + fmt(r.savings) : '—', color: C.green },
+  ];
+  let y = M + 320 * s;
+  rows.forEach((row, i) => {
+    ctx.textAlign = 'left'; ctx.font = `400 ${25 * s}px ${SANS}`; ctx.fillStyle = C.gray;
+    ctx.fillText(row.label, M, y);
+    ctx.textAlign = 'right'; ctx.font = `560 ${44 * s}px ${SERIF}`; ctx.fillStyle = row.color;
+    ctx.fillText(row.value, W - M, y + 8 * s);
+    y += 78 * s;
+    ctx.strokeStyle = C.line;
+    line(M, y - 32 * s, W - M, y - 32 * s);
+  });
+
+  // 结语引文
+  ctx.textAlign = 'center';
+  ctx.font = `italic 520 ${34 * s}px ${SERIF}`; ctx.fillStyle = C.ink;
+  ctx.fillText('利息是租住在自己家里的房租。', W / 2, y + 66 * s);
+  ctx.font = `400 ${22 * s}px ${SANS}`; ctx.fillStyle = C.gray;
+  ctx.fillText('—— 越早看清，越少白付', W / 2, y + 108 * s);
+
+  // 红印章
+  ctx.save();
+  ctx.translate(W - M - 78 * s, M + 156 * s); ctx.rotate(-0.2);
+  ctx.strokeStyle = C.red; ctx.lineWidth = 3 * s;
+  ctx.beginPath(); ctx.arc(0, 0, 56 * s, 0, Math.PI * 2); ctx.stroke();
+  ctx.lineWidth = 1.5 * s;
+  ctx.beginPath(); ctx.arc(0, 0, 46 * s, 0, Math.PI * 2); ctx.stroke();
+  ctx.fillStyle = C.red; ctx.font = `600 ${21 * s}px ${SANS}`; ctx.textAlign = 'center';
+  ctx.fillText('房贷真相', 0, 7 * s);
+  ctx.restore();
+
+  // 底部引流
+  ctx.strokeStyle = C.line;
+  line(M, H - M * 0.95, W - M, H - M * 0.95);
+  ctx.font = `400 ${20 * s}px ${SANS}`; ctx.fillStyle = C.gray; ctx.textAlign = 'center';
+  ctx.fillText('人生账单 · Life Ledger — 把剩下的格子，过成想要的样子', W / 2, H - M * 0.45);
+}
+
+function renderLoanCard() {
+  if (!loanResult) return;
+  const preview = document.getElementById('loanCardPreview');
+  drawLoanCard(preview.getContext('2d'), preview.width, preview.height, loanResult);
+}
+
+document.getElementById('downloadLoanCard').addEventListener('click', () => {
+  if (!loanResult) return;
+  const out = document.createElement('canvas');
+  out.width = 2160; out.height = 2700;
+  drawLoanCard(out.getContext('2d'), out.width, out.height, loanResult);
+  out.toBlob(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '人生账单-房贷真相.png';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }, 'image/png');
+});
+
+/* ---------- URL hash 恢复（分享链接直接复现） ---------- */
+(function restoreFromHash() {
+  const m = location.hash.match(/^#\/time\/(\d{4}-\d{2})$/);
+  if (m) {
+    document.getElementById('birthInput').value = m[1];
+    runTimeLedger({ scroll: false });
+    setTimeout(() => document.getElementById('daysScreen').scrollIntoView({ behavior: 'auto' }), 300);
+    return;
+  }
+  const sm = location.hash.match(/^#\/salary\/([\d.]+)-([\d.]+)-([\d.]+)$/);
+  if (sm) {
+    document.getElementById('salaryInput').value = sm[1];
+    document.getElementById('yearsInput').value = sm[2];
+    document.getElementById('hoursInput').value = sm[3];
+    runSalaryLedger({ scroll: false });
+    setTimeout(() => document.getElementById('incomeScreen').scrollIntoView({ behavior: 'auto' }), 300);
+    return;
+  }
+  const lm = location.hash.match(/^#\/loan\/([\d.]+)-([\d.]+)-(\d+)-([\d.]+)-(\d)-([\d.]+)$/);
+  if (lm) {
+    document.getElementById('loanAmount').value = lm[1];
+    document.getElementById('loanRate').value = lm[2];
+    document.getElementById('loanYears').value = lm[3];
+    document.getElementById('paidYears').value = lm[4];
+    loanType = lm[5] === '1' ? 'equal-principal' : 'equal-payment';
+    document.querySelectorAll('#loanTypeSeg button').forEach(b =>
+      b.classList.toggle('on', b.dataset.type === loanType));
+    document.getElementById('lumpAmount').value = lm[6];
+    runLoanLedger({ scroll: false });
+    setTimeout(() => document.getElementById('paymentScreen').scrollIntoView({ behavior: 'auto' }), 300);
+  }
+})();
+</script>
+</body>
+</html>

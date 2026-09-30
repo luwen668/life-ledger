@@ -1,0 +1,210 @@
+- generic [active] [ref=f1e1]:
+  - banner [ref=f1e4]:
+    - generic [ref=f1e5]:
+      - generic [ref=f1e6]: ¥
+      - generic [ref=f1e7]:
+        - heading "工资个税计算器" [level=1] [ref=f1e8]
+        - paragraph [ref=f1e9]: 五险一金 · 十城通用 · 2025年度口径
+    - tablist [ref=f1e10]:
+      - tab "工资计算" [ref=f1e11] [cursor=pointer]
+      - tab "年终奖" [ref=f1e12] [cursor=pointer]
+      - tab "税后反推" [ref=f1e13] [cursor=pointer]
+      - tab "城市数据" [ref=f1e14] [cursor=pointer]
+  - main [ref=f1e15]:
+    - complementary [ref=f1e16]:
+      - heading "输入参数" [level=2] [ref=f1e17]
+      - generic [ref=f1e18]:
+        - generic [ref=f1e19]: 工作城市
+        - combobox "工作城市" [ref=f1e20] [cursor=pointer]:
+          - option "北京（社保 7,162–35,811）" [selected]
+          - option "上海（社保 7,460–37,302）"
+          - option "广州（社保 5,510–27,549）"
+          - option "深圳（社保 4,775–27,549）"
+          - option "杭州（社保 4,986–25,299）"
+          - option "成都（社保 4,588–22,938）"
+          - option "武汉（社保 4,498–22,488）"
+          - option "南京（社保 4,952–24,762）"
+          - option "重庆（社保 4,404–22,017）"
+          - option "西安（社保 4,559–22,795）"
+      - generic [ref=f1e21]:
+        - generic [ref=f1e22]: 税前月薪（元）
+        - spinbutton "税前月薪（元）" [ref=f1e23]: "20000"
+      - generic [ref=f1e24]:
+        - generic [ref=f1e25]: 年终奖（元，可选）
+        - spinbutton "年终奖（元，可选）" [ref=f1e26]: "0"
+      - generic [ref=f1e27]:
+        - generic [ref=f1e28]:
+          - text: 公积金比例
+          - generic [ref=f1e29]: 12%
+        - slider [ref=f1e30] [cursor=pointer]: "12"
+      - group [ref=f1e31]:
+        - generic "高级：自定义缴纳基数" [ref=f1e32] [cursor=pointer]
+      - heading "专项附加扣除（元/月）" [level=3] [ref=f1e33]
+      - generic [ref=f1e34]:
+        - generic [ref=f1e35]:
+          - generic [ref=f1e36]:
+            - text: 子女教育
+            - generic [ref=f1e37]: 每个子女每月 2000，父母分摊
+          - spinbutton [ref=f1e38]: "0"
+        - generic [ref=f1e39]:
+          - generic [ref=f1e40]:
+            - text: 3岁以下婴幼儿
+            - generic [ref=f1e41]: 每个婴幼儿每月 2000
+          - spinbutton [ref=f1e42]: "0"
+        - generic [ref=f1e43]:
+          - generic [ref=f1e44]:
+            - text: 赡养老人
+            - generic [ref=f1e45]: 独生子女每月 3000；非独分摊最高 1500
+          - combobox [ref=f1e46] [cursor=pointer]:
+            - option "不扣除" [selected]
+            - option "非独生 · 分摊 1500"
+            - option "独生子女 · 3000"
+        - generic [ref=f1e47]:
+          - generic [ref=f1e48]:
+            - text: 住房贷款利息
+            - generic [ref=f1e49]: 每月 1000，与租金二选一
+          - combobox [ref=f1e50] [cursor=pointer]:
+            - option "不扣除" [selected]
+            - option "扣除 1000"
+        - generic [ref=f1e51]:
+          - generic [ref=f1e52]:
+            - text: 住房租金
+            - generic [ref=f1e53]: 按城市分档 800 / 1100 / 1500
+          - combobox [ref=f1e54] [cursor=pointer]:
+            - option "不扣除" [selected]
+            - option "扣除 1500"
+        - generic [ref=f1e55]:
+          - generic [ref=f1e56]:
+            - text: 继续教育
+            - generic [ref=f1e57]: 学历继续教育每月 400
+          - combobox [ref=f1e58] [cursor=pointer]:
+            - option "不扣除" [selected]
+            - option "扣除 400"
+      - paragraph [ref=f1e59]: ※ 2025.7 起执行。工伤按 0.4% 估算（行业浮动 0.2%–1.9%）。
+    - generic [ref=f1e61]:
+      - generic [ref=f1e62]:
+        - generic [ref=f1e63]:
+          - generic [ref=f1e64]: 月均税后到手
+          - generic [ref=f1e65]: 14,657.30
+          - generic [ref=f1e66]: 含年终奖摊薄
+        - generic [ref=f1e67]:
+          - generic [ref=f1e68]: 月均个税
+          - generic [ref=f1e69]: "839.70"
+          - generic [ref=f1e70]: 全年 10,076.40
+        - generic [ref=f1e71]:
+          - generic [ref=f1e72]: 月五险一金（个人）
+          - generic [ref=f1e73]: 4,503.00
+          - generic [ref=f1e74]: 全年 54,036.00
+        - generic [ref=f1e75]:
+          - generic [ref=f1e76]: 单位月缴成本
+          - generic [ref=f1e77]: 7,740.00
+          - generic [ref=f1e78]: 招聘真实成本
+        - generic [ref=f1e79]:
+          - generic [ref=f1e80]: 有效税率
+          - generic [ref=f1e81]: 4.20%
+          - generic [ref=f1e82]: 个税 ÷ 税前年薪
+        - generic [ref=f1e83]:
+          - generic [ref=f1e84]: 全年税后总收入
+          - generic [ref=f1e85]: 175,887.60
+          - generic [ref=f1e86]: 税前 240,000.00
+      - heading "全年 12 个月构成 累计预扣法 · 逐月计算" [level=2] [ref=f1e88]:
+        - text: 全年 12 个月构成
+        - generic [ref=f1e89]: 累计预扣法 · 逐月计算
+      - generic [ref=f1e93]:
+        - heading "逐月明细" [level=2] [ref=f1e94]
+        - table [ref=f1e96]:
+          - rowgroup [ref=f1e97]:
+            - row [ref=f1e98]:
+              - columnheader "月份" [ref=f1e99]
+              - columnheader "税前" [ref=f1e100]
+              - columnheader "五险一金" [ref=f1e101]
+              - columnheader "当月个税" [ref=f1e102]
+              - columnheader "税后到手" [ref=f1e103]
+              - columnheader "累计已预扣" [ref=f1e104]
+          - rowgroup [ref=f1e105]:
+            - row [ref=f1e106]:
+              - cell "1 月" [ref=f1e107]
+              - cell "20,000.00" [ref=f1e108]
+              - cell "4,503.00" [ref=f1e109]
+              - cell "314.91" [ref=f1e110]
+              - cell "15,182.09" [ref=f1e111]
+              - cell "314.91" [ref=f1e112]
+            - row [ref=f1e113]:
+              - cell "2 月" [ref=f1e114]
+              - cell "20,000.00" [ref=f1e115]
+              - cell "4,503.00" [ref=f1e116]
+              - cell "314.91" [ref=f1e117]
+              - cell "15,182.09" [ref=f1e118]
+              - cell "629.82" [ref=f1e119]
+            - row [ref=f1e120]:
+              - cell "3 月" [ref=f1e121]
+              - cell "20,000.00" [ref=f1e122]
+              - cell "4,503.00" [ref=f1e123]
+              - cell "314.91" [ref=f1e124]
+              - cell "15,182.09" [ref=f1e125]
+              - cell "944.73" [ref=f1e126]
+            - row [ref=f1e127]:
+              - cell "4 月" [ref=f1e128]
+              - cell "20,000.00" [ref=f1e129]
+              - cell "4,503.00" [ref=f1e130]
+              - cell "734.07" [ref=f1e131]
+              - cell "14,762.93" [ref=f1e132]
+              - cell "1,678.80" [ref=f1e133]
+            - row [ref=f1e134]:
+              - cell "5 月" [ref=f1e135]
+              - cell "20,000.00" [ref=f1e136]
+              - cell "4,503.00" [ref=f1e137]
+              - cell "1,049.70" [ref=f1e138]
+              - cell "14,447.30" [ref=f1e139]
+              - cell "2,728.50" [ref=f1e140]
+            - row [ref=f1e141]:
+              - cell "6 月" [ref=f1e142]
+              - cell "20,000.00" [ref=f1e143]
+              - cell "4,503.00" [ref=f1e144]
+              - cell "1,049.70" [ref=f1e145]
+              - cell "14,447.30" [ref=f1e146]
+              - cell "3,778.20" [ref=f1e147]
+            - row [ref=f1e148]:
+              - cell "7 月" [ref=f1e149]
+              - cell "20,000.00" [ref=f1e150]
+              - cell "4,503.00" [ref=f1e151]
+              - cell "1,049.70" [ref=f1e152]
+              - cell "14,447.30" [ref=f1e153]
+              - cell "4,827.90" [ref=f1e154]
+            - row [ref=f1e155]:
+              - cell "8 月" [ref=f1e156]
+              - cell "20,000.00" [ref=f1e157]
+              - cell "4,503.00" [ref=f1e158]
+              - cell "1,049.70" [ref=f1e159]
+              - cell "14,447.30" [ref=f1e160]
+              - cell "5,877.60" [ref=f1e161]
+            - row [ref=f1e162]:
+              - cell "9 月" [ref=f1e163]
+              - cell "20,000.00" [ref=f1e164]
+              - cell "4,503.00" [ref=f1e165]
+              - cell "1,049.70" [ref=f1e166]
+              - cell "14,447.30" [ref=f1e167]
+              - cell "6,927.30" [ref=f1e168]
+            - row [ref=f1e169]:
+              - cell "10 月" [ref=f1e170]
+              - cell "20,000.00" [ref=f1e171]
+              - cell "4,503.00" [ref=f1e172]
+              - cell "1,049.70" [ref=f1e173]
+              - cell "14,447.30" [ref=f1e174]
+              - cell "7,977.00" [ref=f1e175]
+            - row [ref=f1e176]:
+              - cell "11 月" [ref=f1e177]
+              - cell "20,000.00" [ref=f1e178]
+              - cell "4,503.00" [ref=f1e179]
+              - cell "1,049.70" [ref=f1e180]
+              - cell "14,447.30" [ref=f1e181]
+              - cell "9,026.70" [ref=f1e182]
+            - row [ref=f1e183]:
+              - cell "12 月" [ref=f1e184]
+              - cell "20,000.00" [ref=f1e185]
+              - cell "4,503.00" [ref=f1e186]
+              - cell "1,049.70" [ref=f1e187]
+              - cell "14,447.30" [ref=f1e188]
+              - cell "10,076.40" [ref=f1e189]
+  - contentinfo [ref=f1e190]:
+    - paragraph [ref=f1e191]: 计算结果仅供参考，实际以当地人社局 / 公积金中心及税务机关口径为准 · 每年 7 月各地基数会调整
